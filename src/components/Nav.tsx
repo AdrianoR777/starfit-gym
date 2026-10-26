@@ -2,6 +2,7 @@
 import Link from "next/link";
 import { Logo } from "@/components/Logo";
 import { useState } from "react";
+import { usePathname } from "next/navigation";
 import { Menu, X } from "lucide-react";
 import { gym } from "@/lib/config";
 
@@ -13,22 +14,24 @@ export const links = [
 
 export function Nav({ logo }: { logo?: string | null }) {
   const [open, setOpen] = useState(false);
+  const home = usePathname() === "/";
+  const primaryLinks = home ? [["/#sedes", "Sedes"], ["/#horario", "Horario"], ["/#clases", "Clases"], ["/#app", "App"], ["/#comunidad", "Comunidad"]] : links.slice(0, 7);
   return (
     <header className="fixed inset-x-0 top-0 z-50 border-b border-line/60 bg-ink/70 backdrop-blur-xl">
       <a href="#main" className="sr-only focus:not-sr-only focus:absolute focus:left-4 focus:top-4 btn btn-lime">Saltar al contenido</a>
       <nav className="mx-auto flex h-16 max-w-7xl items-center justify-between px-4 md:px-8" aria-label="Principal">
         <Link href="/" aria-label="Inicio"><Logo src={logo} /></Link>
         <ul className="hidden gap-6 text-sm text-mute xl:flex">
-          {links.slice(0, 7).map(([h, l]) => <li key={h}><Link className="hover:text-bone" href={h}>{l}</Link></li>)}
+          {primaryLinks.map(([h, l]) => <li key={h}><Link className="hover:text-bone" href={h}>{l}</Link></li>)}
         </ul>
         <div className="flex items-center gap-2">
           <Link href="/login" className="hidden text-sm text-mute hover:text-bone sm:block px-3">Ingresar</Link>
           <Link href="/membresias" className="btn btn-lime !py-2 text-sm">Únete</Link>
-          <button className="p-2 xl:hidden" aria-expanded={open} aria-label="Menú" onClick={() => setOpen(!open)}>{open ? <X /> : <Menu />}</button>
+          <button className="p-2" aria-expanded={open} aria-controls="site-menu" aria-label="Menú" onClick={() => setOpen(!open)}>{open ? <X /> : <Menu />}</button>
         </div>
       </nav>
       {open && (
-        <ul className="grid grid-cols-2 gap-1 border-t border-line bg-ink px-4 py-4 xl:hidden">
+        <ul id="site-menu" className="grid max-h-[75vh] overflow-y-auto grid-cols-2 gap-1 border-t border-line bg-ink px-4 py-4 md:grid-cols-4">
           {[...links, ["/login", "Ingresar"], ["/registro", "Registro"]].map(([h, l]) => (
             <li key={h}><Link onClick={() => setOpen(false)} className="block rounded-lg px-3 py-3 hover:bg-graphite" href={h}>{l}</Link></li>
           ))}
